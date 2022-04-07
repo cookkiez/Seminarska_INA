@@ -65,7 +65,8 @@ def read_from_csv(filename="london-lsoa-2020-1-All-HourlyAggregate.csv",
     # Convert data frames into lists, so they take less space and only convey information that we need
     edges = []
     for cnt, df_e in enumerate([df_morning_rush, df_mid_day, df_afternoon_rush, df_night]):
-        temp = [[int(i), int(j), hod, mtt] for [i, j, hod, mtt] in df_e.values.tolist()]
+        df_e.drop('hod', inplace=True, axis=1)
+        temp = [[int(i), int(j), mtt] for [i, j, mtt] in df_e.values.tolist()]
         # The last interval is very large, so we split it into three parts, so the files can be stored on github
         if cnt == 3:
             mod = int(len(temp) / 3)
@@ -91,8 +92,8 @@ def read_from_csv(filename="london-lsoa-2020-1-All-HourlyAggregate.csv",
 
     for i, e in enumerate(dict_to_save["edges"]):
         with open(f'edges_data_{i}.json', 'w') as handle:
-            parsed = json.loads(str(e))
-            json.dump(parsed, handle, indent=2)
+            # parsed = json.loads(str(e))
+            json.dump(e, handle)  # , indent=2)
 
 
 if __name__ == "__main__":
