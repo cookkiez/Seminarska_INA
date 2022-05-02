@@ -66,12 +66,26 @@ def read_from_csv(filename="london-lsoa-2020-1-All-HourlyAggregate.csv",
     edges = []
     for cnt, df_e in enumerate([df_morning_rush, df_mid_day, df_afternoon_rush, df_night]):
         df_e.drop('hod', inplace=True, axis=1)
-        temp = [[int(i), int(j), mtt] for [i, j, mtt] in df_e.values.tolist()]
+
+        print(f"Iterating data in interval: {cnt}")
+        to_print = []
+        visited = {}
+        for [i, j, mtt] in df_e.values.tolist():
+            if f"{i},{j}" not in visited:
+                visited[f"{i},{j}"] = [mtt]
+            else:
+                visited[f"{i},{j}"].append(mtt)
+
+        for key in visited:
+            i, j = [float(x) for x in key.split(",")]
+            vals = visited[key]
+            to_print.append([int(i), int(j), sum(vals)/len(vals)])
+
         # The last interval is very large, so we split it into three parts, so the files can be stored on github
-        if cnt == 3:
-            mod = int(len(temp) / 3)
+        """if cnt == 3:
+            mod = int(len(to_print) / 3)
             t = []
-            for i, el in enumerate(temp):
+            for i, el in enumerate(to_print):
                 t.append(el)
                 # If condition is (i + 1) % mod == 0, then we will get one small file with 1-3 edges in it and we don't
                 # want that
@@ -79,8 +93,8 @@ def read_from_csv(filename="london-lsoa-2020-1-All-HourlyAggregate.csv",
                     edges.append(t)
                     t = []
             edges.append(t)
-        else:
-            edges.append(temp)
+        else:"""
+        edges.append(to_print)
 
     dict_to_save = {
         "nodes": nodes_data,
