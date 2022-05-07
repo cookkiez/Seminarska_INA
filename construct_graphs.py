@@ -97,6 +97,8 @@ def spatial_graph():
     f = open("./nodes_data.json")
     data = json.load(f)
 
+    print("Constructing a spatial graph")
+
     # Let's walk through all parts of the city and use them as nodes in the graph
     # Then we calculate distances to all other parts of the city and add them
     # as weghts to edges: edge represents a distance between two parts of the city.
@@ -135,43 +137,101 @@ def temporal_graph(time_interval):
     time_interval is a variable representing the slot in the day
     0 - morning rush
     1 - mid-day
-    2 - afternoon-rush
-    3 to 5 - night time
+    2 - afternoon rush
+    3 - night time
     We will denote graph as Gs = (Ns, Es, ws)
     """
     G = nx.DiGraph(name = "Temporal graph") # Directed graph
     print("Reading: edges_data_" + str(time_interval) + ".json")
     # Opening JSON file
-    f = open("./edges_data_" + str(time_interval) + ".json")
-            
+    f_nodes = open("./nodes_data.json")
+    f_edges = open("./edges_data_" + str(time_interval) + ".json")
+
     # returns JSON object as
     # a dictionary
-    data = json.load(f)
-    print(type(data))
+    nodes_data = json.load(f_nodes)
+    times_data = json.load(f_edges)
+    # print(type(data))
+
+    print("Constructing a temporal graph")
+
+    # Let's first add all the nodes in the graph from nodes_data.json file
+    for node in nodes_data:
+      node_id = int(node['node_id'])
+      G.add_node(node_id, label=node_id)
+
+    # Now let's append the edges from edges_data.json file
+    for time in times_data:
+      G.add_edge(time[0], time[1], weight=time[2])
 
     #G.add_weighted_edges_from(data)
             
-    # Closing file
-    f.close()
+    # Closing files
+    f_nodes.close()
+    f_edges.close()
+
     return G
 
 
 if __name__ == "__main__":
-    # Construct temporal graph
-    G_temp = temporal_graph()
-    info(G_temp)
-
-    print("\n")
 
     #Construct spatial graph
     G_spat = spatial_graph()
     info(G_spat)
-    
-    tops(G_spat, nx.closeness_centrality, 'closeness')
-    #tops(G, closeness_centrality, 'closeness')
-    tops(G_spat, nx.betweenness_centrality, 'betweenness')
-    
 
-    tops(G_temp, nx.closeness_centrality, 'closeness')
-    #tops(G, closeness_centrality, 'closeness')
-    tops(G_temp, nx.betweenness_centrality, 'betweenness')
+    print("\n")
+
+    # Construct temporal graph for each time slot in the day
+    # This means 4 different temporal directed graphs
+    G_temp_morning = temporal_graph(0)
+    info(G_temp_morning)
+
+    print("\n")
+
+    G_temp_mid = temporal_graph(1)
+    info(G_temp_mid)
+
+    print("\n")
+
+    G_temp_afternoon = temporal_graph(2)
+    info(G_temp_afternoon)
+
+    print("\n")
+
+    G_temp_night = temporal_graph(3)
+    info(G_temp_night)
+
+    print("\n")
+
+    # Closeness centrality    
+    print("Closeness centrality for spatial graph")
+    tops(G_spat, nx.closeness_centrality, 'closeness')
+
+    print("Closeness centrality for temporal graph - morning")
+    tops(G_temp_morning, nx.closeness_centrality, 'closeness')
+
+    print("Closeness centrality for temporal graph - mid")
+    tops(G_temp_mid, nx.closeness_centrality, 'closeness')
+
+    print("Closeness centrality for temporal graph - afternoon")
+    tops(G_temp_afternoon, nx.closeness_centrality, 'closeness')
+
+    print("Closeness centrality for temporal graph - night")
+    tops(G_temp_night, nx.closeness_centrality, 'closeness')
+
+
+    # Betweenness centrality
+    print("Betweenness centrality for spatial graph")
+    tops(G_spat, nx.betweenness_centrality, 'betweenness')
+
+    print("Betweenness centrality for temporal graph - morning")
+    tops(G_temp_morning, nx.betweenness_centrality, 'closeness')
+
+    print("Betweenness centrality for temporal graph - mid")
+    tops(G_temp_mid, nx.betweenness_centrality, 'closeness')
+
+    print("Betweenness centrality for temporal graph - afternoon")
+    tops(G_temp_afternoon, nx.betweenness_centrality, 'closeness')
+
+    print("Betweenness centrality for temporal graph - night")
+    tops(G_temp_night, nx.betweenness_centrality, 'closeness')
