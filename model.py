@@ -5,7 +5,6 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 
-
 def model_train_rmse(model, train_x, train_y, test_x, test_y):
     """
     Train the given model on the given train and test data. After training, use the test set to
@@ -30,7 +29,9 @@ def model_train_rmse(model, train_x, train_y, test_x, test_y):
 
 def do_model():
     df = pd.read_csv("learning_data_all.csv")
+    #df = pd.read_csv("edges_data_0.json")
     google_time = df.google_time.values.reshape(-1, 1)
+    print(google_time)
 
     features = ["aerial", "x1", "x2", "y1", "y2"]
     X = df.loc[:, features].values
