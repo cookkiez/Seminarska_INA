@@ -29,6 +29,19 @@ def predict_with_shortest_path(n1, n2, G):
 
 
 def check_bfs(neigh, G, visited_curr, visited_opposite, queue):
+    """
+    Helper function for the bfs_first_joint().
+    Checks whether current neighbor has been visited on other side.
+    If it has been visited on other side, then return the weights of both paths.
+    Else iterate over its neighbors, build their paths and calculate weights and add them to
+    visited_curr, then add them to the queue.
+    :param neigh: current node under consideration
+    :param G: given graph
+    :param visited_curr: dict of visited nodes for the current node (from n1 or n2 side)
+    :param visited_opposite: dict of visited nodes for the opposited node (from n2 or n1 side)
+    :param queue: the queue for the BFS
+    :return: if path found -> travel time, else -> None
+    """
     curr_path = visited_curr[neigh]["path"]
     if neigh in visited_opposite:
         """ 
@@ -57,12 +70,14 @@ def check_bfs(neigh, G, visited_curr, visited_opposite, queue):
 def bfs_first_joint(n1, n2, G):
     """
     Do BFS over graph from n1 to n2 and n2 to n1 at the same time.
-    Take first common neighbor of n1 and n2, n3. Return travel time = n1-n3 + n2-n3
+    Take first common neighbor of n1 and n2, n3. Return travel time = p1 + p2,
+    where p1 is travel time over path from n1 to n3 and p2 is travel time over path from n2 to n3.
     :param n1: node a
     :param n2: node b
     :param G: Graph with nodes a and b
-    :return: time of travel between a and b
+    :return: time of travel between a and b. If no travel time is found, return None
     """
+
     visited1 = {n1: {"weight": 0, "path": [n1]}}
     visited2 = {n2: {"weight": 0, "path": [n2]}}
     queue1 = [n1]
